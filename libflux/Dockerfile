@@ -10,7 +10,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Download, verify, and install ragel
-ENV RAGEL_VERSION=6.10
+ENV RAGEL_VERSION=7
 RUN curl https://www.colm.net/files/thurston.asc | gpg --import - && \
     curl https://www.colm.net/files/ragel/ragel-${RAGEL_VERSION}.tar.gz -O && \
     curl https://www.colm.net/files/ragel/ragel-${RAGEL_VERSION}.tar.gz.asc -O && \

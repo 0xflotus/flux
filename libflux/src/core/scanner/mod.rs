@@ -5,10 +5,10 @@ pub type CChar = u8;
 
 pub mod scanner;
 
+use crate::fmt;
 use std::collections::HashMap;
 use std::ffi::CString;
 use std::str;
-use std::vec::Vec;
 
 pub struct Scanner {
     data: Vec<u8>,
@@ -43,6 +43,19 @@ pub struct Token {
     pub start_pos: Position,
     pub end_pos: Position,
     pub comments: Option<Box<Token>>,
+}
+
+// To use the `{}` marker, the trait `fmt::Display` must be implemented
+// manually for the type.
+impl fmt::Display for Token {
+    // This trait requires `fmt` with this exact signature.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        // Write strictly the first element into the supplied output
+        // stream: `f`. Returns `fmt::Result` which indicates whether the
+        // operation succeeded or failed. Note that `write!` uses syntax which
+        // is very similar to `println!`.
+        write!(f, "{}", self.lit)
+    }
 }
 
 impl Scanner {
@@ -189,14 +202,14 @@ impl Scanner {
                         tok: TOK_ILLEGAL,
                         lit: nc.to_string(),
                         start_offset: token_start as u32,
-                        end_offset: ( token_start + size as i32 ) as u32,
+                        end_offset: (token_start + size as i32) as u32,
                         start_pos: Position {
                             line: token_start_line as u32,
                             column: token_start_col as u32,
                         },
                         end_pos: Position {
                             line: token_start_line as u32,
-                            column: ( token_start_col + size as i32 ) as u32,
+                            column: (token_start_col + size as i32) as u32,
                         },
                         comments: None,
                     }
@@ -212,9 +225,7 @@ impl Scanner {
         } else {
             // No error or EOF, we can process the returned values normally.
             let lit = unsafe {
-                str::from_utf8_unchecked(
-                    &self.data[(token_start as usize)..(token_end as usize)],
-                )
+                str::from_utf8_unchecked(&self.data[(token_start as usize)..(token_end as usize)])
             };
             Token {
                 tok: self.token,
